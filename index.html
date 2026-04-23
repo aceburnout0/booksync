@@ -38,9 +38,9 @@
     </header>
     <p>Página para gerenciar todos os registros já feitos</p>
     <form id="bookForm">
-        <label for="nome">Nome</label><input type="text" id="nome" required>
-        <label for="sala">Sala</label><input type="text" id="sala" required>
-        <label for="livro">Livro</label><input type="text" id="livro" required>
+        <label for="nome">Nome</label><input type="text" id="nome" placeholder="EX: Leitor da Silva" required>
+        <label for="sala">Sala</label><input type="text" id="sala" placeholder="EX: 2DS" required>
+        <label for="livro">Livro</label><input type="text" id="livro" placeholder="EX: O Livro" required>
         
         <label for="data">Data</label>
         <input type="date" id="data" >
@@ -83,6 +83,9 @@
         </thead>
         <tbody id="corpoTabela"></tbody>
     </table>
+
+    <button type="button" onclick="exportarJSON()" style="background-color: #a595c2; color:white; font-size: 15px;">Exportar os registros em forma de JSON</button>
+
 
     <hr>
 
@@ -182,6 +185,17 @@
 			    } else if (p) {
 			        alert("Senha incorreta!");
 			    }
+			}
+
+			function exportarJSON() {
+			    const lista = localStorage.getItem("registros") || "[]";
+			    const blob = new Blob([lista], { type: "application/json" });
+			    const url = URL.createObjectURL(blob);
+			    const a = document.createElement("a");
+			    a.href = url;
+			    a.download = "registros_booksync.json";
+			    a.click();
+			    URL.revokeObjectURL(url);
 			}
 
     </script>
