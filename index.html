@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+	<style>
+		
+		table tr:nth-child(even) {
+			background-color:#92d197;
+		}
+		table tr:nth-child(odd) {
+			background-color:#a8e3ac;
+		}
+
+		hr {
+			border: black solid 1px;
+		}
+
+		input {
+			background-color:#a8e3ac;
+			border: #92d197 solid 2px;
+		}
+		select {
+			background-color:#a595c2;
+			border: #7964a1 solid 2px;
+		}
+
+	</style>
+	
+    <meta charset="utf-8">
+    <title>Registrar</title>
+</head>
+<body style="background-color: #caedcb;">
+	<div>
+	<header style="background-color: #e9b5ff; padding: 1%;">
+    <h1 style="text-align: center;">BookSync</h1>
+    </header>
+    <p>Página para adicionar e visualizar registros</p>
+    <form id="bookForm">
+        <label for="nome">Nome</label><input type="text" id="nome" required>
+        <label for="sala">Sala</label><input type="text" id="sala" required>
+        <label for="livro">Livro</label><input type="text" id="livro" required>
+        
+        <label for="data">Data</label>
+        <input type="date" id="data" >
+        
+        <label for="hora">Horário</label>
+        <input type="time" id="hora">
+        
+        <input value="Devolução" type="radio" name="troca" id="dev"> <label for="dev" style="display:inline">Devolvimento</label>
+        <input value="Empréstimo" type="radio" name="troca" id="emp" checked> <label for="emp" style="display:inline">Empréstimo</label>
+        
+        <br><br>
+        <button type="button" onclick="adicionarRegistro()" style="background-color: #6d2182; color:white";>Registrar e Salvar</button>
+    </form>
+
+    <hr>
+
+
+
+    <h1>Registros</h1>
+    
+    <label for="filtro">Filtro:</label>
+    <select id="filtro" onchange="renderizarTabela()">
+        <option value="todos">Todos</option>
+        <option value="Devolução">Devolução</option>
+        <option value="Empréstimo">Empréstimo</option>
+    </select>
+
+
+
+    <table>
+        <thead>
+            <tr style="background-color: #6d2182; color: white;">
+                <th>Data/Hora</th>
+                <th>Nome</th>
+                <th>Sala</th>
+                <th>Livro</th>
+                <th>Operação</th>
+            </tr>
+        </thead>
+        <tbody id="corpoTabela"></tbody>
+    </table>
+
+	</div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", carregarDados);
+
+        function adicionarRegistro() {
+            let dataValor = document.getElementById("data").value;
+            let horaValor = document.getElementById("hora").value;
+            
+            const agora = new Date();
+
+            if (!dataValor) {
+                dataValor = agora.toISOString().split('T')[0];
+            }
+            if (!horaValor) {
+                horaValor = agora.toTimeString().split(' ')[0].substring(0, 5);
+            }
+
+            const registro = {
+                id: Date.now(),
+                data: dataValor,
+                hora: horaValor,
+                nome: document.getElementById("nome").value,
+                sala: document.getElementById("sala").value,
+                livro: document.getElementById("livro").value,
+                troca: document.querySelector('input[name="troca"]:checked').value
+            };
+
+            if (!registro.nome || !registro.livro) return alert("Preencha os campos");
+
+            const lista = JSON.parse(localStorage.getItem("registros") || "[]");
+            lista.push(registro);
+            localStorage.setItem("registros", JSON.stringify(lista));
+
+            renderizarTabela();
+            document.getElementById("bookForm").reset();
+        }
+
+        function carregarDados() {
+            renderizarTabela();
+        }
+
+        function renderizarTabela() {
+            const lista = JSON.parse(localStorage.getItem("registros") || "[]");
+            const filtro = document.getElementById("filtro").value;
+            const corpo = document.getElementById("corpoTabela");
+            corpo.innerHTML = ""; 
+
+            const listaFiltrada = filtro === "todos" ? lista : lista.filter(item => item.troca === filtro);
+
+            listaFiltrada.forEach((item) => {
+                let linha = corpo.insertRow();
+                let dataBR = item.data.split('-').reverse().join('/');
+                
+                linha.insertCell(0).innerText = `${dataBR} ${item.hora}`;
+                linha.insertCell(1).innerText = item.nome;
+                linha.insertCell(2).innerText = item.sala;
+                linha.insertCell(3).innerText = item.livro;
+                linha.insertCell(4).innerText = item.troca;
+                
+            });
+        }
+
+    </script>
+</body>
+</html>
