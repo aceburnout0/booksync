@@ -28,13 +28,15 @@
 	
     <meta charset="utf-8">
     <title>Registrar</title>
+    <link rel="icon" type="image/x-icon" href="icone.ico">
 </head>
 <body style="background-color: #caedcb;">
 	<div>
-	<header style="background-color: #e9b5ff; padding: 1%;">
-    <h1 style="text-align: center;">BookSync</h1>
+	<img src="logo.png" style="width: 160px; display: block; margin: auto; ">
+	<header style="background-color: #e9b5ff; padding: 1%; border-radius: 30px; display: flex;">
+    <h1 style="text-align: left; margin: auto;">BookSync | Editor de Registros</h1> 
     </header>
-    <p>Página para adicionar e visualizar registros</p>
+    <p>Página para gerenciar todos os registros já feitos</p>
     <form id="bookForm">
         <label for="nome">Nome</label><input type="text" id="nome" required>
         <label for="sala">Sala</label><input type="text" id="sala" required>
@@ -76,10 +78,21 @@
                 <th>Sala</th>
                 <th>Livro</th>
                 <th>Operação</th>
+                <th>Remover</th>
             </tr>
         </thead>
         <tbody id="corpoTabela"></tbody>
     </table>
+
+    <hr>
+
+    <div style="background-color: #a8e3ac; padding: 5px; border-radius: 25px;">
+    <p> Ajuda: </p>
+    <p>- Os dados precisam ser preenchidos, se não, um erro ocorre.</p>
+    <p>- Se a data ou/e hora não for preenchida(s), a data/hora que irá para a tabela será a data/hora atual.</p>
+    <p>- Se precisa deletar um registro, peça a senha para um Admin.</p>
+    <p>- A tabela é salva localmente, ou seja, os dados são diferentes para cada dispositivo.</p>
+	</div>
 
 	</div>
 
@@ -140,9 +153,36 @@
                 linha.insertCell(2).innerText = item.sala;
                 linha.insertCell(3).innerText = item.livro;
                 linha.insertCell(4).innerText = item.troca;
+
+                let btn = document.createElement("button");
+				btn.innerText = "Excluir";
+				btn.style.backgroundColor = "red";
+				btn.style.color = "white";
+				btn.onclick = () => removerRegistro(item.id);
+				linha.insertCell(5).appendChild(btn);
                 
             });
         }
+
+        	const _0x1a2b = "462fa87c634d28d8d857f4d61050ff3a4909f0449fd19ec388aec3cfacd82d14";
+
+			async function _0x3c4d(s) {
+			    const b = new TextEncoder().encode(s);
+			    const h = await crypto.subtle.digest('SHA-256', b);
+			    return Array.from(new Uint8Array(h)).map(x => x.toString(16).padStart(2, '0')).join('');
+			}
+
+			async function removerRegistro(id) {
+			    const p = prompt("Inserir senha admin:");
+			    if (p && await _0x3c4d(p) === _0x1a2b) {
+			        let l = JSON.parse(localStorage.getItem("registros") || "[]");
+			        l = l.filter(i => i.id !== id);
+			        localStorage.setItem("registros", JSON.stringify(l));
+			        renderizarTabela();
+			    } else if (p) {
+			        alert("Senha incorreta!");
+			    }
+			}
 
     </script>
 </body>
